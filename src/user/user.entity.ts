@@ -1,5 +1,7 @@
 import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
 
+export type UserRole = 'user' | 'admin';
+
 @Entity('users')
 export class User {
   @PrimaryGeneratedColumn('uuid')
@@ -31,4 +33,7 @@ export class User {
 
   @Column({ nullable: true, type: 'timestamp' })
   otpExpiry: Date;
+
+  @Column({ default: 'user' })
+  role: UserRole;
 }

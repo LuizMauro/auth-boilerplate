@@ -22,7 +22,8 @@ import { MailModule } from './mail/mail.module';
     }),
     UserModule,
     AuthModule,
-    MailModule, // Adicione o MailModule aqui
+    MailModule,
   ],
+  providers: [],
 })
 export class AppModule {}
