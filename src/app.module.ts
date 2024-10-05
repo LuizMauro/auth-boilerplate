@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { ThrottlerModule } from '@nestjs/throttler';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
 import { UserModule } from './user/user.module';
@@ -20,6 +21,12 @@ import { MailModule } from './mail/mail.module';
       entities: [__dirname + '/**/*.entity{.ts,.js}'],
       synchronize: true, // Não use em produção
     }),
+    ThrottlerModule.forRoot([
+      {
+        limit: 3, // Número máximo de requisições permitidas
+        ttl: 6000, // Tempo de vida (em segundos) da janela de limite de requisições
+      },
+    ]),
     UserModule,
     AuthModule,
     MailModule,
