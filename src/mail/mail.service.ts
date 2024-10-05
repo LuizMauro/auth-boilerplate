@@ -23,4 +23,21 @@ export class MailService {
       );
     }
   }
+
+  async sendResetPasswordOtp(email: string, otp: string) {
+    try {
+      await this.mailerService.sendMail({
+        from: '"Auth Boilerplate" <no-reply@example.com>',
+        to: email,
+        subject: 'Your Password Reset OTP',
+        text: `Your OTP for password reset is: ${otp}`,
+        html: `<p>Your OTP for password reset is: <strong>${otp}</strong></p>`,
+      });
+    } catch (error) {
+      console.error('Failed to send reset password email:', error);
+      throw new Error(
+        'There was an error sending the reset email. Please try again later.',
+      );
+    }
+  }
 }

@@ -25,4 +25,10 @@ export class User {
 
   @Column({ nullable: true, type: 'timestamp' })
   resetTokenExpiry: Date;
+
+  @Column({ nullable: true })
+  otp: string;
+
+  @Column({ nullable: true, type: 'timestamp' })
+  otpExpiry: Date;
 }

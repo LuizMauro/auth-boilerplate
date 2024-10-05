@@ -62,4 +62,20 @@ export class AuthService {
 
     await this.userService.updatePassword(user.id, newPassword);
   }
+
+  async requestPasswordResetOtp(email: string): Promise<void> {
+    const otp = await this.userService.generateOtp(email);
+    await this.mailService.sendResetPasswordOtp(email, otp);
+  }
+
+  async resetPasswordWithOtp(
+    email: string,
+    otp: string,
+    newPassword: string,
+  ): Promise<void> {
+    const user = await this.userService.validateOtp(email, otp);
+    user.password = await bcrypt.hash(newPassword, 10);
+    await this.userService.updateUser(user);
+    await this.userService.clearOtp(user.id);
+  }
 }

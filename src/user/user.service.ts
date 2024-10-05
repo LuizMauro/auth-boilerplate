@@ -12,6 +12,10 @@ export class UserService {
     private readonly userRepository: Repository<User>,
   ) {}
 
+  async findById(userId: string): Promise<User | undefined> {
+    return this.userRepository.findOne({ where: { id: userId } });
+  }
+
   async findByEmail(email: string): Promise<User | undefined> {
     return this.userRepository.findOne({ where: { email } });
   }
@@ -55,6 +59,10 @@ export class UserService {
     });
   }
 
+  async updateUser(user: User): Promise<User> {
+    return this.userRepository.save(user);
+  }
+
   async updatePassword(userId: string, newPassword: string): Promise<void> {
     const user = await this.userRepository.findOne({
       where: {
@@ -70,5 +78,46 @@ export class UserService {
     user.resetTokenExpiry = null;
 
     await this.userRepository.save(user);
+  }
+
+  async generateOtp(email: string): Promise<string> {
+    const user = await this.findByEmail(email);
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    const otp = randomBytes(3).toString('hex'); // Gera um OTP de 6 caracteres
+    const expiry = new Date(Date.now() + 10 * 60 * 1000); // Expira em 10 minutos
+
+    user.otp = otp;
+    user.otpExpiry = expiry;
+
+    await this.userRepository.save(user);
+    return otp;
+  }
+
+  async validateOtp(email: string, otp: string): Promise<User> {
+    const user = await this.userRepository.findOne({
+      where: {
+        email,
+        otp,
+        otpExpiry: MoreThan(new Date()),
+      },
+    });
+
+    if (!user) {
+      throw new NotFoundException('Invalid or expired OTP');
+    }
+
+    return user;
+  }
+
+  async clearOtp(userId: string): Promise<void> {
+    const user = await this.userRepository.findOne({ where: { id: userId } });
+    if (user) {
+      user.otp = null;
+      user.otpExpiry = null;
+      await this.userRepository.save(user);
+    }
   }
 }

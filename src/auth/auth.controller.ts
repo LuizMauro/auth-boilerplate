@@ -31,4 +31,19 @@ export class AuthController {
     await this.authService.resetPassword(token, newPassword);
     return { message: 'Password has been reset' };
   }
+  @Post('request-password-reset-otp')
+  async requestPasswordResetOtp(@Body('email') email: string) {
+    await this.authService.requestPasswordResetOtp(email);
+    return { message: 'OTP sent to your email' };
+  }
+
+  @Post('reset-password-with-otp')
+  async resetPasswordWithOtp(
+    @Body('email') email: string,
+    @Body('otp') otp: string,
+    @Body('newPassword') newPassword: string,
+  ) {
+    await this.authService.resetPasswordWithOtp(email, otp, newPassword);
+    return { message: 'Password has been reset' };
+  }
 }
