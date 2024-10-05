@@ -1,85 +1,119 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# Auth Boilerplate
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+## Visão Geral
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+Este é um boilerplate de autenticação desenvolvido em NestJS e PostgreSQL, que fornece funcionalidades para autenticação, autorização e segurança dos usuários.
 
-## Description
+## Funcionalidades Disponíveis
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+### 1. Cadastro de Usuário
 
-## Project setup
+- Permite que novos usuários se registrem fornecendo nome, email e senha.
+- As senhas são armazenadas de forma segura utilizando bcrypt.
+
+### 2. Login com JWT
+
+- Autenticação usando JSON Web Tokens (JWT).
+- O usuário recebe um token JWT após um login bem-sucedido, que pode ser usado para acessar recursos protegidos.
+
+### 3. Redefinição de Senha
+
+- Permite que os usuários solicitem a redefinição de senha enviando um email de verificação.
+- Um token de redefinição é gerado e enviado ao email do usuário, com um link para definir uma nova senha.
+- O link de redefinição de senha expira após 10 minutos.
+
+### 4. Proteção de Rotas e Controle de Acesso
+
+- Rotas protegidas por JwtAuthGuard para garantir que apenas usuários autenticados possam acessá-las.
+- RolesGuard para controle de permissões baseado em papéis (como ‘admin’, ‘user’, etc.), permitindo um controle de acesso mais granular.
+
+### 5. Rate Limiting (Limitação de Requisições)
+
+- Utiliza ThrottlerModule para limitar o número de requisições em um período de tempo.
+- Protege endpoints críticos, como login, contra ataques de força bruta.
+
+### 6. Notificações de Segurança
+
+- **Tentativas Falhas de Login:** O usuário é notificado por email após 5 tentativas falhas de login.
+
+### 7. Registro de Tentativas Falhas no Banco de Dados
+
+- As tentativas falhas de login são armazenadas no banco de dados, com um contador para cada usuário e o registro do tempo da última tentativa.
+- Após um período de 5 minutos sem novas tentativas, o contador é resetado.
+
+### 8. Estratégia de Autenticação com OAuth (em progresso)
+
+- Integração planejada com provedores externos de login, como Google, Facebook e GitHub.
+- Facilita o login dos usuários utilizando credenciais que eles já possuem.
+
+## Como Executar o Projeto
+
+### Requisitos
+
+- Node.js (v14 ou superior)
+- PostgreSQL
+- NestJS CLI (opcional, para desenvolvimento)
+
+### Instalação
+
+1. Clone o repositório:
+
+   ```bash
+   git clone https://github.com/LuizMauro/auth-boilerplate
+   ```
+
+2. Instale as dependências::
 
 ```bash
-$ npm install
+ npm install
 ```
 
-## Compile and run the project
+3. Crie um arquivo `.env` com as seguintes variáveis:
 
 ```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+  JWT_SECRET=your_secret_key
+  # DB CONFIG
+  DB_HOST=localhost
+  DB_PORT=5432
+  DB_USERNAME=your_username
+  DB_PASSWORD=your_password
+  DB_NAME=your_database
+  # EMAIL CONFIG
+  EMAIL_USER=your_username
+  EMAIL_PASS="your_password"
+  EMAIL_HOST=localhost
+  EMAIL_PORT=2525
+  # RATE LIMITNG
+  RATE_LIMITING_LIMIT=10
+  RATE_LIMITING_TTL=60
+  # Login Attempts
+  FAILED_LOGIN_ATTEMPTS=5
+  # FRONTEND
+  FRONTEND_URL=http://localhost:3000
 ```
 
-## Run tests
+### Executando a Aplicação
+
+- Execute o projeto em ambiente de desenvolvimento:
 
 ```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+  npm run start:dev
 ```
 
-## Resources
+### Documentação da API
 
-Check out a few resources that may come in handy when working with NestJS:
+- **Swagger**: Planejado para futuras melhorias, a documentação interativa da API estará disponível através do Swagger.
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+### Melhorias Planejadas
 
-## Support
+- **Login Social**: Integração com OAuth para login via Google, Facebook e GitHub.
+- **Login de Novo Dispositivo:** O usuário recebe um alerta sempre que um login é realizado de um dispositivo desconhecido.
+- **Alteração de Senha:** Notificação de confirmação enviada ao email do usuário quando a senha é alterada.
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+### Contribuição
 
-## Stay in touch
+Contribuições são bem-vindas! Sinta-se à vontade para abrir issues e pull requests para melhorias ou correções.
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+### Licença
 
-## License
-
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+Este projeto está licenciado sob a Licença MIT.
