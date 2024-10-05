@@ -36,4 +36,10 @@ export class User {
 
   @Column({ default: 'user' })
   role: UserRole;
+
+  @Column({ default: 0 })
+  failedLoginAttempts: number;
+
+  @Column({ type: 'timestamp', nullable: true })
+  lastFailedLoginAttempt: Date;
 }

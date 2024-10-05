@@ -40,4 +40,14 @@ export class MailService {
       );
     }
   }
+
+  async sendSecurityAlertEmail(email: string) {
+    await this.mailerService.sendMail({
+      from: '"Auth Boilerplate" <no-reply@example.com>',
+      to: email,
+      subject: 'Alerta de Tentativas de Login',
+      text: `Detectamos várias tentativas falhas de login em sua conta. Caso não tenha sido você, recomendamos que altere sua senha imediatamente.`,
+      html: `<p>Detectamos várias tentativas falhas de login em sua conta. Caso não tenha sido você, recomendamos que altere sua senha imediatamente.</p>`,
+    });
+  }
 }

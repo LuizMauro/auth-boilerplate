@@ -42,10 +42,15 @@ export class AuthService {
 
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
+      await this.handleFailedLoginAttempt(user);
       throw new UnauthorizedException(
         'Credenciais inválidas. Verifique seu email e senha.',
       );
     }
+
+    // Resetar tentativas falhas ao fazer login com sucesso
+    user.failedLoginAttempts = 0;
+    await this.userService.updateUser(user);
 
     const payload = { sub: user.id, email: user.email, role: user.role };
     const accessToken = this.jwtService.sign(payload);
@@ -81,5 +86,27 @@ export class AuthService {
     user.password = await bcrypt.hash(newPassword, 10);
     await this.userService.updateUser(user);
     await this.userService.clearOtp(user.id);
+  }
+
+  private async handleFailedLoginAttempt(user: User) {
+    const currentTime = new Date();
+    const timeDifference = user.lastFailedLoginAttempt
+      ? (currentTime.getTime() - user.lastFailedLoginAttempt.getTime()) / 1000
+      : null;
+
+    if (timeDifference && timeDifference > 300) {
+      // Se passaram mais de 5 minutos desde a última tentativa falha, resetar contador
+      user.failedLoginAttempts = 1;
+    } else {
+      user.failedLoginAttempts += 1;
+    }
+
+    user.lastFailedLoginAttempt = currentTime;
+
+    if (user.failedLoginAttempts >= Number(process.env.FAILED_LOGIN_ATTEMPTS)) {
+      await this.mailService.sendSecurityAlertEmail(user.email);
+    }
+
+    await this.userService.updateUser(user);
   }
 }
