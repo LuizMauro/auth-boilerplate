@@ -1,15 +1,21 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { UserService } from '../user/user.service';
 import { JwtService } from '@nestjs/jwt';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import * as bcrypt from 'bcrypt';
 import { User } from '../user/user.entity';
+import { MailService } from 'src/mail/mail.service';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly userService: UserService,
+    private readonly mailService: MailService,
     private readonly jwtService: JwtService,
   ) {}
 
@@ -41,5 +47,19 @@ export class AuthService {
     const accessToken = this.jwtService.sign(payload);
 
     return { accessToken };
+  }
+
+  async requestPasswordReset(email: string): Promise<void> {
+    const resetToken = await this.userService.generateResetToken(email);
+    await this.mailService.sendResetPasswordEmail(email, resetToken);
+  }
+
+  async resetPassword(token: string, newPassword: string): Promise<void> {
+    const user = await this.userService.findByResetToken(token);
+    if (!user) {
+      throw new NotFoundException('Invalid or expired password reset token');
+    }
+
+    await this.userService.updatePassword(user.id, newPassword);
   }
 }

@@ -16,4 +16,19 @@ export class AuthController {
   async login(@Body() loginDto: LoginDto) {
     return this.authService.login(loginDto);
   }
+
+  @Post('request-password-reset')
+  async requestPasswordReset(@Body('email') email: string) {
+    await this.authService.requestPasswordReset(email);
+    return { message: 'Password reset email sent' };
+  }
+
+  @Post('reset-password')
+  async resetPassword(
+    @Body('token') token: string,
+    @Body('newPassword') newPassword: string,
+  ) {
+    await this.authService.resetPassword(token, newPassword);
+    return { message: 'Password has been reset' };
+  }
 }
