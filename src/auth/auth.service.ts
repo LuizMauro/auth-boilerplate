@@ -3,6 +3,7 @@ import {
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
+import { v4 as uuidv4 } from 'uuid';
 import { UserService } from '../user/user.service';
 import { JwtService } from '@nestjs/jwt';
 import { RegisterDto } from './dto/register.dto';
@@ -10,6 +11,7 @@ import { LoginDto } from './dto/login.dto';
 import * as bcrypt from 'bcrypt';
 import { User } from '../user/user.entity';
 import { MailService } from 'src/mail/mail.service';
+import { SessionService } from 'src/session/session.service';
 
 @Injectable()
 export class AuthService {
@@ -17,6 +19,7 @@ export class AuthService {
     private readonly userService: UserService,
     private readonly mailService: MailService,
     private readonly jwtService: JwtService,
+    private readonly sessionService: SessionService,
   ) {}
 
   async register(registerDto: RegisterDto): Promise<User> {
@@ -52,10 +55,17 @@ export class AuthService {
     user.failedLoginAttempts = 0;
     await this.userService.updateUser(user);
 
-    const payload = { sub: user.id, email: user.email, role: user.role };
+    const jti = uuidv4();
+    const payload = { sub: user.id, email: user.email, role: user.role, jti };
     const accessToken = this.jwtService.sign(payload);
 
+    await this.sessionService.createSession(user, accessToken, jti);
+
     return { accessToken };
+  }
+
+  async logout(token: string): Promise<void> {
+    await this.sessionService.deleteSession(token);
   }
 
   async requestPasswordReset(email: string): Promise<void> {

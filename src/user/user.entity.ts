@@ -1,4 +1,5 @@
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+import { Session } from 'src/session/session.entity';
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
 
 export type UserRole = 'user' | 'admin';
 
@@ -42,4 +43,7 @@ export class User {
 
   @Column({ type: 'timestamp', nullable: true })
   lastFailedLoginAttempt: Date;
+
+  @OneToMany(() => Session, (session) => session.user)
+  sessions: Session[];
 }

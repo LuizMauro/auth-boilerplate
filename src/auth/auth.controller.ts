@@ -1,9 +1,11 @@
-import { Controller, Post, Body, UseGuards } from '@nestjs/common';
+import { Controller, Post, Body, UseGuards, Req } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 
 import { CustomThrottlerGuard } from './custom-throttler.guard';
+import { JwtAuthGuard } from './jwt-auth.guard';
+import { AuthenticatedRequest } from 'src/types/express-request.interface';
 
 @Controller('auth')
 export class AuthController {
@@ -48,5 +50,13 @@ export class AuthController {
   ) {
     await this.authService.resetPasswordWithOtp(email, otp, newPassword);
     return { message: 'Password has been reset' };
+  }
+
+  @Post('logout')
+  @UseGuards(JwtAuthGuard)
+  async logout(@Req() req: AuthenticatedRequest) {
+    const token = req.headers.authorization.split(' ')[1];
+    await this.authService.logout(token);
+    return { message: 'Logout realizado com sucesso.' };
   }
 }
