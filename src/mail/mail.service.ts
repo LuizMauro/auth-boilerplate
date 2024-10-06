@@ -50,4 +50,14 @@ export class MailService {
       html: `<p>Detectamos várias tentativas falhas de login em sua conta. Caso não tenha sido você, recomendamos que altere sua senha imediatamente.</p>`,
     });
   }
+
+  async notificationResetPassword(email: string) {
+    await this.mailerService.sendMail({
+      from: '"Auth Boilerplate" <no-reply@example.com>',
+      to: email,
+      subject: 'Alerta de mudança de senha',
+      text: `Sua Senha foi alterada com sucesso!`,
+      html: `<p>Sua Senha foi alterada com sucesso!</p>`,
+    });
+  }
 }

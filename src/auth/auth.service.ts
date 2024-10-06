@@ -79,7 +79,12 @@ export class AuthService {
       throw new NotFoundException('Invalid or expired password reset token');
     }
 
+    if (user.resetTokenExpiry && user.resetTokenExpiry < new Date()) {
+      throw new UnauthorizedException('Token de redefinição expirado.');
+    }
+
     await this.userService.updatePassword(user.id, newPassword);
+    this.mailService.notificationResetPassword(user.email);
   }
 
   async requestPasswordResetOtp(email: string): Promise<void> {
@@ -100,10 +105,8 @@ export class AuthService {
       throw new UnauthorizedException('Token de redefinição expirado.');
     }
 
-    user.password = await bcrypt.hash(newPassword, 10);
-    user.resetToken = null;
-    user.resetTokenExpiry = null;
-    await this.userService.updateUser(user);
+    await this.userService.updatePassword(user.id, newPassword);
+    this.mailService.notificationResetPassword(user.email);
   }
 
   private async handleFailedLoginAttempt(user: User) {
