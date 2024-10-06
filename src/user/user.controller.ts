@@ -5,7 +5,7 @@ import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
 
 @Controller('user')
-@UseGuards(JwtAuthGuard, RolesGuard) // O JwtAuthGuard vem antes do RolesGuard
+@UseGuards(JwtAuthGuard, RolesGuard)
 export class UserController {
   constructor(private readonly userService: UserService) {}
 

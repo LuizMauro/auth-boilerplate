@@ -4,8 +4,8 @@ import { SessionService } from './session.service';
 import { Session } from './session.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Session])], // Importa a entidade Session
-  providers: [SessionService], // Declara o SessionService como um provedor
-  exports: [SessionService], // Exporta o SessionService para ser usado em outros módulos
+  imports: [TypeOrmModule.forFeature([Session])],
+  providers: [SessionService],
+  exports: [SessionService],
 })
 export class SessionModule {}

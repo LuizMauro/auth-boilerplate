@@ -23,8 +23,8 @@ import { MailModule } from './mail/mail.module';
     }),
     ThrottlerModule.forRoot([
       {
-        limit: Number(process.env.RATE_LIMITING_LIMIT), // Número máximo de requisições permitidas
-        ttl: Number(process.env.RATE_LIMITING_TTL), // Tempo de vida (em segundos) da janela de limite de requisições
+        limit: Number(process.env.RATE_LIMITING_LIMIT),
+        ttl: Number(process.env.RATE_LIMITING_TTL),
       },
     ]),
     UserModule,

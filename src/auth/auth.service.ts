@@ -12,6 +12,7 @@ import * as bcrypt from 'bcrypt';
 import { User } from '../user/user.entity';
 import { MailService } from 'src/mail/mail.service';
 import { SessionService } from 'src/session/session.service';
+import { randomBytes } from 'crypto';
 
 @Injectable()
 export class AuthService {
@@ -51,7 +52,6 @@ export class AuthService {
       );
     }
 
-    // Resetar tentativas falhas ao fazer login com sucesso
     user.failedLoginAttempts = 0;
     await this.userService.updateUser(user);
 
@@ -69,7 +69,7 @@ export class AuthService {
   }
 
   async requestPasswordReset(email: string): Promise<void> {
-    const resetToken = await this.userService.generateResetToken(email);
+    const resetToken = await this.generateResetToken(email);
     await this.mailService.sendResetPasswordEmail(email, resetToken);
   }
 
@@ -83,19 +83,27 @@ export class AuthService {
   }
 
   async requestPasswordResetOtp(email: string): Promise<void> {
-    const otp = await this.userService.generateOtp(email);
+    const otp = await this.generateOtp(email);
     await this.mailService.sendResetPasswordOtp(email, otp);
   }
 
-  async resetPasswordWithOtp(
-    email: string,
-    otp: string,
+  async resetPasswordWithToken(
+    resetToken: string,
     newPassword: string,
   ): Promise<void> {
-    const user = await this.userService.validateOtp(email, otp);
+    const user = await this.userService.findByResetToken(resetToken);
+    if (!user) {
+      throw new NotFoundException('Token de redefinição inválido ou expirado.');
+    }
+
+    if (user.resetTokenExpiry && user.resetTokenExpiry < new Date()) {
+      throw new UnauthorizedException('Token de redefinição expirado.');
+    }
+
     user.password = await bcrypt.hash(newPassword, 10);
+    user.resetToken = null;
+    user.resetTokenExpiry = null;
     await this.userService.updateUser(user);
-    await this.userService.clearOtp(user.id);
   }
 
   private async handleFailedLoginAttempt(user: User) {
@@ -105,7 +113,6 @@ export class AuthService {
       : null;
 
     if (timeDifference && timeDifference > 300) {
-      // Se passaram mais de 5 minutos desde a última tentativa falha, resetar contador
       user.failedLoginAttempts = 1;
     } else {
       user.failedLoginAttempts += 1;
@@ -118,5 +125,57 @@ export class AuthService {
     }
 
     await this.userService.updateUser(user);
+  }
+
+  async verifyOtp(email: string, otp: string): Promise<{ resetToken: string }> {
+    const user = await this.userService.findByEmail(email);
+    if (!user || user.otp !== otp) {
+      throw new UnauthorizedException(
+        'OTP inválido ou usuário não encontrado.',
+      );
+    }
+
+    if (user.otpExpiry && user.otpExpiry < new Date()) {
+      throw new UnauthorizedException('OTP expirado.');
+    }
+
+    const resetToken = await this.generateResetToken(user.email);
+
+    return { resetToken };
+  }
+
+  async generateResetToken(email: string): Promise<string> {
+    const user = await this.userService.findByEmail(email);
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    const resetToken = randomBytes(32).toString('hex');
+    const expiry = new Date(Date.now() + 10 * 60 * 1000);
+
+    user.resetToken = resetToken;
+    user.resetTokenExpiry = expiry;
+    user.otp = null;
+    user.otpExpiry = null;
+
+    await this.userService.updateUser(user);
+
+    return resetToken;
+  }
+
+  async generateOtp(email: string): Promise<string> {
+    const user = await this.userService.findByEmail(email);
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    const otp = randomBytes(3).toString('hex');
+    const expiry = new Date(Date.now() + 10 * 60 * 1000);
+
+    user.otp = otp;
+    user.otpExpiry = expiry;
+
+    await this.userService.updateUser(user);
+    return otp;
   }
 }
