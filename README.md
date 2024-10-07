@@ -18,9 +18,17 @@ Este é um boilerplate de autenticação desenvolvido em NestJS e PostgreSQL, qu
 
 ### 3. Redefinição de Senha
 
+### 3.1 Via Email
+
 - Permite que os usuários solicitem a redefinição de senha enviando um email de verificação.
 - Um token de redefinição é gerado e enviado ao email do usuário, com um link para definir uma nova senha.
 - O link de redefinição de senha expira após 10 minutos.
+
+### 3.2 Via OTP (One-Time Password)
+
+- Permite que os usuários solicitem um código OTP enviado ao email registrado
+- O usuário deve inserir o OTP junto com uma nova senha para redefinir a senha da conta.
+- O OTP tem validade de 10 minutos e é invalidado após ser usado.
 
 ### 4. Proteção de Rotas e Controle de Acesso
 
@@ -35,6 +43,7 @@ Este é um boilerplate de autenticação desenvolvido em NestJS e PostgreSQL, qu
 ### 6. Notificações de Segurança
 
 - **Tentativas Falhas de Login:** O usuário é notificado por email após 5 tentativas falhas de login.
+- **Alteração de Senha:** Notificação de confirmação enviada ao email do usuário quando a senha é alterada.
 
 ### 7. Registro de Tentativas Falhas no Banco de Dados
 
@@ -102,13 +111,12 @@ Este é um boilerplate de autenticação desenvolvido em NestJS e PostgreSQL, qu
 
 ### Documentação da API
 
-- **Swagger**: Planejado para futuras melhorias, a documentação interativa da API estará disponível através do Swagger.
+- **Swagger**: A documentação interativa da API está disponível através do Swagger na rota `/docs`.
 
 ### Melhorias Planejadas
 
 - **Login Social**: Integração com OAuth para login via Google, Facebook e GitHub.
 - **Login de Novo Dispositivo:** O usuário recebe um alerta sempre que um login é realizado de um dispositivo desconhecido.
-- **Alteração de Senha:** Notificação de confirmação enviada ao email do usuário quando a senha é alterada.
 
 ### Contribuição
 
