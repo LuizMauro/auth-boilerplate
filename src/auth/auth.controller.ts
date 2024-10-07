@@ -10,8 +10,8 @@ import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 
-import { CustomThrottlerGuard } from './custom-throttler.guard';
-import { JwtAuthGuard } from './jwt-auth.guard';
+import { CustomThrottlerGuard } from './guards/custom-throttler.guard';
+import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { AuthenticatedRequest } from 'src/types/express-request.interface';
 
 @ApiTags('auth')
