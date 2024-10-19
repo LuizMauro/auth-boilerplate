@@ -48,8 +48,8 @@ jobs:
 
       - name: Deploy to VPS
         run: |
-          scp -o StrictHostKeyChecking=no dist.tar.gz ubuntu@107.23.137.107:/home/ubuntu/
-          ssh -o StrictHostKeyChecking=no ubuntu@107.23.137.107 << 'EOF'
+          scp -o StrictHostKeyChecking=no dist.tar.gz ubuntu@34.203.247.162:/home/ubuntu/
+          ssh -o StrictHostKeyChecking=no ubuntu@34.203.247.162 << 'EOF'
             if [ ! -d "~/services/auth-service" ]; then
               mkdir -p ~/services/auth-service
             fi
