@@ -1,4 +1,4 @@
-# Auth Boilerplate s
+# Auth Boilerplate
 
 ## Visão Geral
 
