@@ -1,4 +1,4 @@
-# Etapa de build
+
 FROM node:20 as build
 
 WORKDIR /app
@@ -8,7 +8,7 @@ RUN npm install
 COPY . .
 RUN npm run build
 
-# Etapa de produção
+
 FROM node:20 AS production
 
 WORKDIR /app
