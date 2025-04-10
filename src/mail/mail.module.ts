@@ -16,7 +16,7 @@ import { MailService } from './mail.service';
           },
         },
         defaults: {
-          from: '"No Reply" <noreply@example.com>',
+          from: '"No Reply" <no-reply@resend.dev>',
         },
       }),
     }),

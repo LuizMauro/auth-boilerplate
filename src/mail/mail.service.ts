@@ -10,7 +10,7 @@ export class MailService {
 
     try {
       await this.mailerService.sendMail({
-        from: '"Auth Boilerplate" <no-reply@example.com>',
+        from: '"Auth Boilerplate" <no-reply@resend.dev>',
         to: email,
         subject: 'Password Reset Request',
         text: `You requested a password reset. Click here to reset your password: ${resetUrl}`,
@@ -27,7 +27,7 @@ export class MailService {
   async sendResetPasswordOtp(email: string, otp: string) {
     try {
       await this.mailerService.sendMail({
-        from: '"Auth Boilerplate" <no-reply@example.com>',
+        from: '"Auth Boilerplate" <no-reply@resend.dev>',
         to: email,
         subject: 'Your Password Reset OTP',
         text: `Your OTP for password reset is: ${otp}`,
@@ -43,7 +43,7 @@ export class MailService {
 
   async sendSecurityAlertEmail(email: string) {
     await this.mailerService.sendMail({
-      from: '"Auth Boilerplate" <no-reply@example.com>',
+      from: '"Auth Boilerplate" <no-reply@resend.dev>',
       to: email,
       subject: 'Alerta de Tentativas de Login',
       text: `Detectamos várias tentativas falhas de login em sua conta. Caso não tenha sido você, recomendamos que altere sua senha imediatamente.`,
@@ -53,7 +53,7 @@ export class MailService {
 
   async notificationResetPassword(email: string) {
     await this.mailerService.sendMail({
-      from: '"Auth Boilerplate" <no-reply@example.com>',
+      from: '"Auth Boilerplate" <no-reply@resend.dev>',
       to: email,
       subject: 'Alerta de mudança de senha',
       text: `Sua Senha foi alterada com sucesso!`,
